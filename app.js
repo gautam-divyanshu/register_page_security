@@ -4,6 +4,7 @@ import bodyParser from "body-parser";
 import ejs from "ejs";
 import mongoose from "mongoose";
 import encrypt from "mongoose-encryption";
+import md5 from "md5"; //level 3 security : hashing
 
 const app = express();
 
@@ -17,8 +18,9 @@ const userSchema = new mongoose.Schema({
   email: String,
   password: String,
 });
-
-userSchema.plugin(encrypt, { secret: process.env.SECRET, encryptedFields: ["password"] });//SECRET is in env file.
+// level 2 security: encryption4
+// userSchema.plugin(encrypt, { secret: process.env.SECRET, encryptedFields: ["password"] });
+//SECRET is in env file.
 
 const User = mongoose.model("User", userSchema);
 
@@ -38,7 +40,7 @@ app.post("/register", async (req, res) => {
   try {
     const newUser = await User.create({
       email: req.body.username,
-      password: req.body.password,
+      password: md5(req.body.password), //level 2 
     });
     res.render("secrets");
   } catch (err) {
@@ -48,12 +50,12 @@ app.post("/register", async (req, res) => {
 
 app.post("/login", async (req, res) => {
   const username = req.body.username;
-  const password = req.body.password;
+  const password = md5(req.body.password); //level 2
 
   try {
     const foundUser = await User.findOne({ email: username });
     if (foundUser) {
-      if (foundUser.password === password) {
+      if (foundUser.password === password) { //level 2
         res.render("secrets");
       }
     }

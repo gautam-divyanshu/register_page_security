@@ -4,8 +4,10 @@
     "dotenv": "^16.3.1",
     "ejs": "^3.1.9",
     "express": "^4.18.2",
+    "md5": "^2.3.0",
     "mongoose": "^7.4.3",
-    "mongoose-encryption": "^2.1.2"
+    "mongoose-encryption": "^2.1.2",
+    "passport-google-oauth20": "^2.0.0"
   },
   "name": "18.secrets---starting-code",
   "version": "1.0.0",
