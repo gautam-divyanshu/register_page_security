@@ -32,6 +32,7 @@ const userSchema = new mongoose.Schema({
   email: String,
   password: String,
   googleId: String,
+  secrets: String
 }); //for using plugin schema must a mongoose schema not just like simple js object.
 
 userSchema.plugin(passportLocalMongoose); //very important
@@ -102,12 +103,35 @@ app.get("/register", (req, res) => {
   res.render("register");
 });
 
-app.get("/secrets", (req, res) => {
-  // from passport
-  if (req.isAuthenticated()) {
-    res.render("secrets");
-  } else {
-    res.redirect("/login");
+app.get("/secrets", async (req, res) => {
+  try {
+    const foundUsers = await User.find({ secrets: { $ne: null } });
+    if (foundUsers) {
+      res.render("secrets", { usersWithSecrets:foundUsers });
+    }
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+app.get("/submit", (req, res) => {
+  res.render("submit");
+});
+
+app.post("/submit", async (req, res) => {
+  const submittedSecret = req.body.secret;
+  //Once the user is authenticated and their session gets saved, their user details are saved to req.user.
+  // console.log(req.user.id);
+
+  try {
+    const foundUser = await User.findById(req.user.id);
+    if (foundUser) {
+      foundUser.secrets = submittedSecret;
+      foundUser.save();
+      res.redirect("/secrets");
+    }
+  } catch (err) {
+    console.log(err);
   }
 });
 
